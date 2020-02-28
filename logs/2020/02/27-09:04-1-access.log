@@ -1,0 +1,5 @@
+::ffff:127.0.0.1 - - [27/Feb/2020:14:04:09 +0000] "POST /auth/register HTTP/1.1" 422 134
+::ffff:127.0.0.1 - - [27/Feb/2020:14:04:24 +0000] "POST /auth/register HTTP/1.1" 422 134
+::ffff:127.0.0.1 - - [27/Feb/2020:14:04:24 +0000] "POST /auth/register HTTP/1.1" 200 16
+::ffff:127.0.0.1 - - [27/Feb/2020:14:04:56 +0000] "POST /auth/register HTTP/1.1" 422 134
+::ffff:127.0.0.1 - - [27/Feb/2020:14:04:57 +0000] "POST /auth/register HTTP/1.1" 200 45

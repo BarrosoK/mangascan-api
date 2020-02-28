@@ -1,0 +1,37 @@
+{
+  "name": "weber-api",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "nodemon ./bin/www",
+    "start": "node ./bin/www",
+    "test": "jest --coverage "
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
+  },
+  "dependencies": {
+    "axios": "^0.19.2",
+    "cheerio": "^1.0.0-rc.3",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "dotenv": "^8.2.0",
+    "express": "~4.16.1",
+    "express-session": "^1.17.0",
+    "express-validator": "^6.3.1",
+    "fs": "0.0.1-security",
+    "http-errors": "~1.6.3",
+    "mongodb": "^3.5.2",
+    "mongoose": "^5.8.10",
+    "morgan": "~1.9.1",
+    "nodemon": "^2.0.2",
+    "rotating-file-stream": "^2.0.2"
+  },
+  "devDependencies": {
+    "jest": "^25.1.0",
+    "supertest": "^4.0.2"
+  }
+}
