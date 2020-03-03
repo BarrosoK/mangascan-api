@@ -19,7 +19,7 @@ async function listPageMangaKakalot(page) {
         fail.push(page);
         return;
     }
-    const $ =  cheerio.load(result.data);
+    const $ = cheerio.load(result.data);
     const htmlList = $('div[class="truyen-list"]');
     htmlList.find('.list-truyen-item-wrap > h3 > a').each(function (index, element) {
         const href = element.attribs.href;
@@ -33,7 +33,7 @@ async function listMangaKakalot() {
     let page = 1;
 
     let result = await axios.get(urlList + page);
-    let $ =  cheerio.load(result.data);
+    let $ = cheerio.load(result.data);
     let maxPage = $('div[class="panel_page_number"] > div.group_page > a.page_blue.page_last').text();
     const regExp = /\(([^)]+)\)/;
     const matches = regExp.exec(maxPage);
@@ -44,8 +44,8 @@ async function listMangaKakalot() {
         page++;
     }
 
-    var intervalId = setInterval(function(){
-        var timoutId = setTimeout(function(){
+    var intervalId = setInterval(function () {
+        var timoutId = setTimeout(function () {
             if (fail.length > 0) {
                 fail.forEach((page, index, object) => {
                     object.splice(index, 1);
@@ -59,17 +59,17 @@ async function listMangaKakalot() {
     console.log(list);
 }
 
-String.prototype.removeLineCarriage = function() {
+String.prototype.removeLineCarriage = function () {
     return this.replace(/(\r\n|\n|\r)/gm, "");
 };
 
-String.prototype.removeBackSlash = function() {
+String.prototype.removeBackSlash = function () {
     return this.replace(/\\/g, '');
 };
 
 module.exports.info = async (id) => {
     let result = await axios.get(urlInfo + id);
-    let $ =  cheerio.load(result.data);
+    let $ = cheerio.load(result.data);
 
     const img = $('img', '.info-image').attr('src');
     const info = $('div[class="story-info-right"]');
@@ -89,25 +89,58 @@ module.exports.info = async (id) => {
     const description = $('#panel-story-info-description').find('h3')[0].nextSibling.nodeValue.removeLineCarriage().removeBackSlash();
 
     const chapters = [];
-    const chapterTable = $('ul[class="row-content-chapter"] > li').each(function(i, elm) {
-        let chapter =  $(this).children();
-        let number = parseInt($(chapter[0]).text().split(' ')[1]);
+    const chapterTable = $('ul[class="row-content-chapter"] > li').each(function (i, elm) {
+        let chapter = $(this).children();
+        let chapterHref = $(chapter[0]).attr('href')
+        let href = chapterHref.substr(chapterHref.lastIndexOf('/') + 1);
+        let title = $(chapter[0]).text();
         let view = parseInt($(chapter[1]).text().replace(',', ''));
         let uploaded = $(chapter[2]).text();
-        chapters.push({number, view, uploaded});
+        chapters.push({title, href, view, uploaded});
     });
 
-    return {img, title, alternative, author, status, genres, updated, view, rating, description, chapters};
+    const wallHaven = await axios.get(`https://wallhaven.cc/api/v1/search?apikey=Q7vof4qjmQmkMo7ZwQkd7RNZwKtLkyEZ&categories=010&sorting=revelance&q=${title}`);
+    let backgroundImgUrl = [];
+    if (wallHaven.data.data.length > 0) {
+        backgroundImgUrl.push(wallHaven.data.data[0].path);
+        let i = 1;
+        while (wallHaven.data.data[i].path && i < 4) {
+            backgroundImgUrl.push(wallHaven.data.data[i++].path)
+        }
+    } else {
+        const alphaCoder = await axios.get(`https://wall.alphacoders.com/api2.0/get.php?auth=a9124dfb5329d327d6a8e1d99568b91b&method=search&term=${title}`);
+        if (alphaCoder.data.wallpapers.length > 0) {
+            backgroundImgUrl.push(alphaCoder.data.wallpapers[0].url_image);
+            let i = 1;
+            while (alphaCoder.data.wallpapers[i].url_image && i < 2) {
+                backgroundImgUrl.push(alphaCoder.data.wallpapers[i++].url_image)
+            }
+        }
+    }
+    return {
+        backgroundImgUrl,
+        img,
+        title,
+        alternative,
+        author,
+        status,
+        genres,
+        updated,
+        view,
+        rating,
+        description,
+        chapters
+    };
 };
 
 module.exports.chapter = async (id, chapter) => {
-    let result = await axios.get(`${urlChapter}${id}/chapter_${chapter}`);
-    let $ =  cheerio.load(result.data);
+    let result = await axios.get(`${urlChapter}${id}/${chapter}`);
+    let $ = cheerio.load(result.data);
 
     const chapterContent = $('div[class="container-chapter-reader"]');
 
     const imgUrls = [];
-    const img = chapterContent.find('img').each(function(i, elm) {
+    const img = chapterContent.find('img').each(function (i, elm) {
         imgUrls.push($(this).attr('src'));
     });
 
@@ -115,6 +148,6 @@ module.exports.chapter = async (id, chapter) => {
 };
 
 
-// listMangaKakalot();
+listMangaKakalot();
 
 module.exports.list = list;
